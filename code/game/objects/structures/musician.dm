@@ -60,7 +60,7 @@
 		return
 
 	// now generate name
-	var/soundfile = "sound/instruments/[instrumentDir]/[ascii2text(note+64)][acc][oct].[instrumentExt]"
+	var/soundfile = "sound/runtime/instruments/[instrumentDir]/[ascii2text(note+64)][acc][oct].[instrumentExt]"
 	soundfile = file(soundfile)
 	// make sure the note exists
 	if(!fexists(soundfile))
@@ -126,7 +126,7 @@
 						else
 							cur_oct[cur_note] = text2num(ni)
 					if(user.dizziness > 0 && prob(user.dizziness / 2))
-						cur_note = CLAMP(cur_note + rand(round(-user.dizziness / 10), round(user.dizziness / 10)), 1, 7)
+						cur_note = clamp(cur_note + rand(round(-user.dizziness / 10), round(user.dizziness / 10)), 1, 7)
 					if(user.dizziness > 0 && prob(user.dizziness / 5))
 						if(prob(30))
 							cur_acc[cur_note] = "#"

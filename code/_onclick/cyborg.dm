@@ -14,7 +14,7 @@
 	if(check_click_intercept(params,A))
 		return
 
-	if(stat || lockcharge || IsParalyzed() || IsStun() || IsUnconscious())
+	if(stat || lockcharge || IsParalyzed() || IsStun())
 		return
 
 	var/list/modifiers = params2list(params)
@@ -84,11 +84,6 @@
 			else
 				W.afterattack(A, src, 0, params)
 				return
-
-//Middle click cycles through selected modules.
-/mob/living/silicon/robot/MiddleClickOn(atom/A)
-	. = ..()
-	cycle_modules()
 
 //Give cyborgs hotkey clicks without breaking existing uses of hotkey clicks
 // for non-doors/apcs

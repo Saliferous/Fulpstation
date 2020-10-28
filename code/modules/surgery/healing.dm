@@ -1,5 +1,3 @@
-#define PER_ITERATION_XP_CAP	MEDICAL_SKILL_MEDIUM //TW XP gain scales with repeated iterations so we cap it.
-
 /datum/surgery/healing
 	steps = list(/datum/surgery_step/incise,
 				/datum/surgery_step/retract_skin,
@@ -8,13 +6,22 @@
 				/datum/surgery_step/heal,
 				/datum/surgery_step/close)
 
-	target_mobtypes = list(/mob/living/carbon/human, /mob/living/carbon/monkey)
+	target_mobtypes = list(/mob/living)
 	possible_locs = list(BODY_ZONE_CHEST)
 	requires_bodypart_type = FALSE
 	replaced_by = /datum/surgery
 	ignore_clothes = TRUE
 	var/healing_step_type
 	var/antispam = FALSE
+
+/datum/surgery/healing/can_start(mob/user, mob/living/patient)
+	. = ..()
+	if(isanimal(patient))
+		var/mob/living/simple_animal/critter = patient
+		if(!critter.healable)
+			return FALSE
+	if(!(patient.mob_biotypes & (MOB_ORGANIC|MOB_HUMANOID)))
+		return FALSE
 
 /datum/surgery/healing/New(surgery_target, surgery_location, surgery_bodypart)
 	..()
@@ -48,12 +55,11 @@
 		"<span class='notice'>[user] attempts to patch some of [target]'s [woundtype].</span>")
 
 /datum/surgery_step/heal/initiate(mob/user, mob/living/carbon/target, target_zone, obj/item/tool, datum/surgery/surgery, try_to_fail = FALSE)
-	if(..())
-		experience_given = min(experience_given+1,PER_ITERATION_XP_CAP)
-		while((brutehealing && target.getBruteLoss()) || (burnhealing && target.getFireLoss()))
-			if(!..())
-				break
-			experience_given = min(experience_given+1,PER_ITERATION_XP_CAP)
+	if(!..())
+		return
+	while((brutehealing && target.getBruteLoss()) || (burnhealing && target.getFireLoss()))
+		if(!..())
+			break
 
 /datum/surgery_step/heal/success(mob/user, mob/living/carbon/target, target_zone, obj/item/tool, datum/surgery/surgery, default_display_results = FALSE)
 	var/umsg = "You succeed in fixing some of [target]'s wounds" //no period, add initial space to "addons"
@@ -73,6 +79,7 @@
 		umsg += " as best as you can while they have clothing on"
 		tmsg += " as best as they can while [target] has clothing on"
 	target.heal_bodypart_damage(urhealedamt_brute,urhealedamt_burn)
+	remove_husking(target) //FULPSTATION MEDBORG CHANGES -Surrealistik Feb 2020
 	display_results(user, target, "<span class='notice'>[umsg].</span>",
 		"[tmsg].",
 		"[tmsg].")
@@ -91,7 +98,7 @@
 		urdamageamt_brute += round((target.getBruteLoss()/ (missinghpbonus*2)),0.1)
 		urdamageamt_burn += round((target.getFireLoss()/ (missinghpbonus*2)),0.1)
 
-	target.take_bodypart_damage(urdamageamt_brute, urdamageamt_burn)
+	target.take_bodypart_damage(urdamageamt_brute, urdamageamt_burn, wound_bonus=CANT_WOUND)
 	return FALSE
 
 /***************************BRUTE***************************/
@@ -217,5 +224,3 @@
 		"<span class='warning'>[user] screws up!</span>",
 		"<span class='notice'>[user] fixes some of [target]'s wounds.</span>", TRUE)
 	target.take_bodypart_damage(5,5)
-
-#undef PER_ITERATION_XP_CAP

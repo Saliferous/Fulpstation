@@ -80,6 +80,11 @@
 	cleanspeed = 3 //Only the truest of mind soul and body get one of these
 	uses = 301
 
+/obj/item/soap/omega/suicide_act(mob/user)
+	user.visible_message("<span class='suicide'>[user] is using [src] to scrub themselves from the timeline! It looks like [user.p_theyre()] trying to commit suicide!</span>")
+	new /obj/structure/chrono_field(user.loc, user)
+	return MANUAL_SUICIDE
+
 /obj/item/paper/fluff/stations/soap
 	name = "ancient janitorial poem"
 	desc = "An old paper that has passed many hands."
@@ -158,7 +163,7 @@
 	desc = "A horn off of a bicycle."
 	icon = 'icons/obj/items_and_weapons.dmi'
 	icon_state = "bike_horn"
-	item_state = "bike_horn"
+	inhand_icon_state = "bike_horn"
 	lefthand_file = 'icons/mob/inhands/equipment/horns_lefthand.dmi'
 	righthand_file = 'icons/mob/inhands/equipment/horns_righthand.dmi'
 	throwforce = 0
@@ -200,28 +205,25 @@
 	name = "golden bike horn"
 	desc = "Golden? Clearly, it's made with bananium! Honk!"
 	icon_state = "gold_horn"
-	item_state = "gold_horn"
-	var/flip_cooldown = 0
+	inhand_icon_state = "gold_horn"
+	COOLDOWN_DECLARE(golden_horn_cooldown)
 
 /obj/item/bikehorn/golden/attack()
-	if(flip_cooldown < world.time)
-		flip_mobs()
+	flip_mobs()
 	return ..()
 
 /obj/item/bikehorn/golden/attack_self(mob/user)
-	if(flip_cooldown < world.time)
-		flip_mobs()
+	flip_mobs()
 	..()
 
 /obj/item/bikehorn/golden/proc/flip_mobs(mob/living/carbon/M, mob/user)
+	if(!COOLDOWN_FINISHED(src, golden_horn_cooldown))
+		return
 	var/turf/T = get_turf(src)
 	for(M in ohearers(7, T))
-		if(ishuman(M) && M.can_hear())
-			var/mob/living/carbon/human/H = M
-			if(istype(H.ears, /obj/item/clothing/ears/earmuffs))
-				continue
-		M.emote("flip")
-	flip_cooldown = world.time + 7
+		if(M.can_hear())
+			M.emote("flip")
+	COOLDOWN_START(src, golden_horn_cooldown, 1 SECONDS)
 
 //canned laughter
 /obj/item/reagent_containers/food/drinks/soda_cans/canned_laughter

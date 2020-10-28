@@ -2,7 +2,7 @@
 	name = "Black Bowler"
 	desc = "A deep black bowler. Inside the hat, there is a sleek red S, with a smaller X insignia embroidered within. On closer inspection, the brim feels oddly weighted..."
 	icon_state = "bowler"
-	item_state = "bowler"
+	inhand_icon_state = "bowler"
 	dynamic_hair_suffix = ""
 	force = 3
 	throwforce = 45
@@ -12,4 +12,4 @@
 	attack_verb = list("attacked", "slashed", "sliced", "ripped", "diced", "cut", "flayed", "eviscerated")
 	armour_penetration = 30 //5 points less then a double esword!
 	hitsound = "swing_hit"
-	sharpness = IS_SHARP
+	sharpness = SHARP_EDGED

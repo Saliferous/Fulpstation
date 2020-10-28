@@ -197,22 +197,20 @@
 	desc = "A heated storage unit."
 	icon_state = "donkvendor"
 	icon = 'icons/obj/lavaland/donkvendor.dmi'
+	base_build_path = /obj/machinery/smartfridge/survival_pod
 	light_range = 5
 	light_power = 1.2
 	light_color = "#DDFFD3"
 	max_n_of_items = 10
 	pixel_y = -4
 	flags_1 = NODECONSTRUCT_1
-	var/empty = FALSE
 
 /obj/machinery/smartfridge/survival_pod/ComponentInitialize()
 	. = ..()
 	AddElement(/datum/element/update_icon_blocker)
 
-/obj/machinery/smartfridge/survival_pod/Initialize(mapload)
+/obj/machinery/smartfridge/survival_pod/preloaded/Initialize(mapload)
 	. = ..()
-	if(empty)
-		return
 	for(var/i in 1 to 5)
 		var/obj/item/reagent_containers/food/snacks/donkpocket/warm/W = new(src)
 		load(W)
@@ -225,11 +223,6 @@
 
 /obj/machinery/smartfridge/survival_pod/accept_check(obj/item/O)
 	return isitem(O)
-
-/obj/machinery/smartfridge/survival_pod/empty
-	name = "dusty survival pod storage"
-	desc = "A heated storage unit. This one's seen better days."
-	empty = TRUE
 
 //Fans
 /obj/structure/fans
@@ -280,10 +273,11 @@
 
 //Signs
 /obj/structure/sign/mining
-	name = "nanotrasen mining corps sign"
+	name = "\improper Nanotrasen mining corps sign"
 	desc = "A sign of relief for weary miners, and a warning for would-be competitors to Nanotrasen's mining claims."
 	icon = 'icons/turf/walls/survival_pod_walls.dmi'
 	icon_state = "ntpod"
+	buildable_sign = FALSE
 
 /obj/structure/sign/mining/survival
 	name = "shelter sign"
@@ -331,4 +325,4 @@
 	icon = initial(I.icon)
 	desc = initial(I.desc)
 	icon_state = initial(I.icon_state)
-	item_state = initial(I.item_state)
+	inhand_icon_state = initial(I.inhand_icon_state)

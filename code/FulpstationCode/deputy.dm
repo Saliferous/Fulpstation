@@ -1,9 +1,7 @@
 /datum/job/deputy
 	title = "Deputy"
-	flag = DEPUTY
 	auto_deadmin_role_flags = DEADMIN_POSITION_SECURITY
 	department_head = list("Head of Security")
-	department_flag = ENGSEC
 	faction = "Station"
 	total_positions = 4 //Kept in for posterity
 	spawn_positions = 4 //ditto
@@ -31,7 +29,7 @@
 /obj/item/clothing/under/rank/security/mallcop
 	name = "deputy shirt"
 	desc = "An awe-inspiring tactical shirt-and-pants combo; because safety never takes a holiday."
-	mob_overlay_icon = 'icons/fulpicons/mith_stash/clothing/under_worn.dmi' //will be sharing a DMI with digisuits
+	worn_icon = 'icons/fulpicons/mith_stash/clothing/under_worn.dmi' //will be sharing a DMI with digisuits
 	icon = 'icons/fulpicons/mith_stash/clothing/under_icons.dmi'
 	icon_state = "mallcop"
 	strip_delay = 50
@@ -52,7 +50,7 @@
 /obj/item/clothing/head/beret/sec/engineering
 	name = "engineering deputy beret"
 	desc = "Perhaps the only thing standing between the supermatter and a station-wide explosive sabotage."
-	mob_overlay_icon = 'icons/fulpicons/mith_stash/clothing/head_worn.dmi'
+	worn_icon = 'icons/fulpicons/mith_stash/clothing/head_worn.dmi'
 	icon = 'icons/fulpicons/mith_stash/clothing/head_icons.dmi'
 	icon_state = "beret_engi"
 	fulp_item = TRUE
@@ -60,7 +58,7 @@
 /obj/item/clothing/head/beret/sec/medical
 	name = "medical deputy beret"
 	desc = "This proud white-blue beret is a welcome sight when the greytide descends on chemistry."
-	mob_overlay_icon = 'icons/fulpicons/mith_stash/clothing/head_worn.dmi'
+	worn_icon = 'icons/fulpicons/mith_stash/clothing/head_worn.dmi'
 	icon = 'icons/fulpicons/mith_stash/clothing/head_icons.dmi'
 	icon_state = "beret_medbay"
 	fulp_item = TRUE
@@ -68,7 +66,7 @@
 /obj/item/clothing/head/beret/sec/science
 	name = "science deputy beret"
 	desc = "This loud purple beret screams 'Dont mess with his matter manipulator!'"
-	mob_overlay_icon = 'icons/fulpicons/mith_stash/clothing/head_worn.dmi'
+	worn_icon = 'icons/fulpicons/mith_stash/clothing/head_worn.dmi'
 	icon = 'icons/fulpicons/mith_stash/clothing/head_icons.dmi'
 	icon_state = "beret_science"
 	fulp_item = TRUE
@@ -76,7 +74,7 @@
 /obj/item/clothing/head/beret/sec/supply
 	name = "supply deputy beret"
 	desc = "The headwear for only the most eagle-eyed Deputy, able to watch both Cargo and Mining."
-	mob_overlay_icon = 'icons/fulpicons/mith_stash/clothing/head_worn.dmi'
+	worn_icon = 'icons/fulpicons/mith_stash/clothing/head_worn.dmi'
 	icon = 'icons/fulpicons/mith_stash/clothing/head_icons.dmi'
 	icon_state = "beret_supply"
 	fulp_item = TRUE
@@ -86,15 +84,15 @@
 	jobtype = /datum/job/deputy
 
 	head = /obj/item/clothing/head/beret/sec
-	belt = /obj/item/pda/security
+	belt = /obj/item/storage/belt/security/fulp_starter_full
 	ears = /obj/item/radio/headset/headset_sec
 	uniform = /obj/item/clothing/under/rank/security/mallcop
 	accessory = /obj/item/clothing/accessory/armband/deputy
 	shoes = /obj/item/clothing/shoes/jackboots
 	l_pocket = /obj/item/restraints/handcuffs/cable/zipties
-	r_pocket = /obj/item/assembly/flash/handheld
-	glasses = /obj/item/clothing/glasses/hud/security/sunglasses
-	backpack_contents = list(/obj/item/melee/baton/loaded=1)
+	r_pocket = /obj/item/pda/security
+
+	glasses = /obj/item/clothing/glasses/hud/security
 
 	backpack = /obj/item/storage/backpack/security
 	satchel = /obj/item/storage/backpack/satchel/sec
@@ -155,7 +153,7 @@ GLOBAL_LIST_INIT(available_deputy_depts, list(SEC_DEPT_ENGINEERING, SEC_DEPT_MED
 			ears = /obj/item/radio/headset/headset_sec/department/sci
 			head = /obj/item/clothing/head/beret/sec/science
 			head_p = /obj/item/clothing/head/helmet/space/plasmaman/science
-			dep_access = list(ACCESS_TOX, ACCESS_TOX_STORAGE, ACCESS_RESEARCH, ACCESS_XENOBIOLOGY, ACCESS_MECH_SCIENCE)
+			dep_access = list(ACCESS_RESEARCH, ACCESS_XENOBIOLOGY, ACCESS_MECH_SCIENCE)
 			destination = /area/security/checkpoint/science
 			spawn_point = get_fulp_spawn(destination)
 

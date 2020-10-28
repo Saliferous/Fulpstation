@@ -58,10 +58,10 @@
 	name = "Quantum Power Cell"
 	desc = "A rechargeable, entangled power cell."
 	id = "quantumcell"
-	build_type = PROTOLATHE
+	build_type = PROTOLATHE | MECHFAB
 	materials = list(/datum/material/iron = 1000, /datum/material/glass = 5500, /datum/material/plasma = 3500, /datum/material/diamond = 1000, /datum/material/bluespace = 1000)
 	build_path = /obj/item/stock_parts/cell/quantum/empty
-	category = list("Power Designs")
+	category = list("Power Designs","Misc")
 	lathe_time_factor = 0.2
 	departmental_flags = DEPARTMENTAL_FLAG_ENGINEERING | DEPARTMENTAL_FLAG_SCIENCE
 
@@ -147,6 +147,7 @@
 	maxcharge = 50000
 	custom_materials = list(/datum/material/iron = 1000, /datum/material/glass = 5500, /datum/material/plasma = 3500, /datum/material/diamond = 1000, /datum/material/bluespace = 1000)
 	chargerate = 5000
+	rating = 6
 
 /obj/item/stock_parts/cell/quantum/empty/Initialize()
 	. = ..()
@@ -190,19 +191,19 @@
 
 ///T5 Motorized wheelchair code///
 
-/obj/vehicle/ridden/wheelchair/motorized/proc/RunOver(var/mob/living/carbon/human/H)
+/obj/vehicle/ridden/wheelchair/motorized/proc/RunOver(var/mob/living/carbon/H)
 	var/bloodiness = 0
 	log_combat(src, H, "run over", null, "(DAMTYPE: [uppertext(BRUTE)])")
-	H.visible_message("<span class='danger'>[src] drives over [H]!</span>", "<span class='userdanger'>[src] drives over you!</span>")
+	H.visible_message("<span class='danger'>[src] runs [H] over!</span>", "<span class='userdanger'>[src] runs you over!</span>")
 	playsound(loc, 'sound/effects/splat.ogg', 50, TRUE)
 
-	var/damage = rand(1,10) //Choose between 1 and 10, then use for damage calc applied to head, chest, legs and arms.
+	var/damage = rand(7,9) //Choose a number between 7 and 9, then use that number for the damage calculations applied to the head, chest, legs and arms.
 	H.apply_damage(2*damage, BRUTE, BODY_ZONE_HEAD, H.run_armor_check(BODY_ZONE_HEAD, "melee"))
 	H.apply_damage(2*damage, BRUTE, BODY_ZONE_CHEST, H.run_armor_check(BODY_ZONE_CHEST, "melee"))
 	H.apply_damage(0.5*damage, BRUTE, BODY_ZONE_L_LEG, H.run_armor_check(BODY_ZONE_L_LEG, "melee"))
 	H.apply_damage(0.5*damage, BRUTE, BODY_ZONE_R_LEG, H.run_armor_check(BODY_ZONE_R_LEG, "melee"))
 	H.apply_damage(0.5*damage, BRUTE, BODY_ZONE_L_ARM, H.run_armor_check(BODY_ZONE_L_ARM, "melee"))
-	H.apply_damage(0.5*damage, BRUTE, BODY_ZONE_R_ARM, H.run_armor_check(BODY_ZONE_R_ARM, "melee"))
+	H.apply_damage(0.5*damage, BRUTE, BODY_ZONE_R_ARM, H.run_armor_check(BODY_ZONE_R_ARM, "melee")) //in total, this will be 42-54 damage (before the application of melee armor)
 	if(islizard(H)) //If H (target) is a lizard, deal 0.5*var/damage to their tail. Sorry rico!
 		H.adjustOrganLoss(ORGAN_SLOT_TAIL, 0.5*damage)
 	H.Knockdown(85)

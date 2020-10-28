@@ -12,9 +12,8 @@
 	idle_power_usage = 5
 	active_power_usage = 100
 	circuit = /obj/item/circuitboard/machine/smartfridge
-	ui_x = 440
-	ui_y = 550
 
+	var/base_build_path = /obj/machinery/smartfridge ///What path boards used to construct it should build into when dropped. Needed so we don't accidentally have them build variants with items preloaded in them.
 	var/max_n_of_items = 1500
 	var/allow_ai_retrieve = FALSE
 	var/list/initial_contents
@@ -42,7 +41,9 @@
 		. += "<span class='notice'>The status display reads: This unit can hold a maximum of <b>[max_n_of_items]</b> items.</span>"
 
 /obj/machinery/smartfridge/update_icon_state()
+	SSvis_overlays.remove_vis_overlay(src, managed_vis_overlays)
 	if(!machine_stat)
+		SSvis_overlays.add_vis_overlay(src, icon, "smartfridge-light-mask", EMISSIVE_LAYER, EMISSIVE_PLANE, dir, alpha)
 		if (visible_contents)
 			switch(contents.len)
 				if(0)
@@ -91,19 +92,14 @@
 
 		if(accept_check(O))
 			load(O)
-			user.visible_message("<span class='notice'>[user] has added \the [O] to \the [src].</span>", "<span class='notice'>You add \the [O] to \the [src].</span>")
+			user.visible_message("<span class='notice'>[user] adds \the [O] to \the [src].</span>", "<span class='notice'>You add \the [O] to \the [src].</span>")
 			updateUsrDialog()
 			if (visible_contents)
 				update_icon()
 			return TRUE
 
 		if(istype(O, /obj/item/storage/bag) || istype(O, /obj/item/organ_storage)) //FULPSTATION MEDBORG ORGAN STORAGE FIX Surrealistik Nov 2019
-			if(istype(O, /obj/item/organ_storage)) //FULPSTATION MEDBORG ORGAN STORAGE TWEAK Surrealistik Jan 2020 BEGIN
-				O.icon_state = initial(O.icon_state) //We need to properly update the icon and overlays by reverting to our initial state.
-				O.desc = initial(O.desc)
-				O.cut_overlays()
-				O = O.contents[1] //FULPSTATION MEDBORG ORGAN STORAGE TWEAK Surrealistik Jan 2020 END
-			var/obj/item/storage/P = O
+			var/obj/item/P = O //FULPSTATION MEDBORG ORGAN STORAGE TWEAK Surrealistik Jan 2020 END
 			var/loaded = 0
 			for(var/obj/G in P.contents)
 				if(contents.len >= max_n_of_items)
@@ -111,6 +107,9 @@
 				if(accept_check(G))
 					load(G)
 					loaded++
+					if(istype(O, /obj/item/organ_storage)) //FULPSTATION MEDBORG ORGAN STORAGE TWEAK Surrealistik Jan 2020 END
+						var/obj/item/organ_storage/S = O
+						S.clear_organ() //FULPSTATION MEDBORG ORGAN STORAGE TWEAK Surrealistik Jan 2020 END
 			updateUsrDialog()
 
 			if(loaded)
@@ -139,7 +138,7 @@
 
 
 /obj/machinery/smartfridge/proc/accept_check(obj/item/O)
-	if(istype(O, /obj/item/reagent_containers/food/snacks/grown/) || istype(O, /obj/item/seeds/) || istype(O, /obj/item/grown/))
+	if(istype(O, /obj/item/reagent_containers/food/snacks/grown/) || istype(O, /obj/item/seeds/) || istype(O, /obj/item/grown/) || istype(O, /obj/item/graft/))
 		return TRUE
 	return FALSE
 
@@ -165,10 +164,10 @@
 		adjust_item_drop_location(O)
 
 
-/obj/machinery/smartfridge/ui_interact(mob/user, ui_key = "main", datum/tgui/ui = null, force_open = FALSE, datum/tgui/master_ui = null, datum/ui_state/state = GLOB.default_state)
-	ui = SStgui.try_update_ui(user, src, ui_key, ui, force_open)
+/obj/machinery/smartfridge/ui_interact(mob/user, datum/tgui/ui)
+	ui = SStgui.try_update_ui(user, src, ui)
 	if(!ui)
-		ui = new(user, src, ui_key, "smartvend", name, ui_x, ui_y, master_ui, state)
+		ui = new(user, src, "SmartVend", name)
 		ui.set_autoupdate(FALSE)
 		ui.open()
 
@@ -240,13 +239,14 @@
 // ----------------------------
 /obj/machinery/smartfridge/drying_rack
 	name = "drying rack"
-	desc = "A wooden contraption, used to dry plant products, food and leather."
+	desc = "A wooden contraption, used to dry plant products, food and hide."
 	icon = 'icons/obj/hydroponics/equipment.dmi'
 	icon_state = "drying_rack"
 	use_power = IDLE_POWER_USE
 	idle_power_usage = 5
 	active_power_usage = 200
 	visible_contents = FALSE
+	base_build_path = /obj/machinery/smartfridge/drying_rack //should really be seeing this without admin fuckery.
 	var/drying = FALSE
 
 /obj/machinery/smartfridge/drying_rack/Initialize()
@@ -318,7 +318,7 @@
 		var/obj/item/reagent_containers/food/snacks/S = O
 		if(S.dried_type)
 			return TRUE
-	if(istype(O, /obj/item/stack/sheet/wetleather/))
+	if(istype(O, /obj/item/stack/sheet/wethide))
 		return TRUE
 	return FALSE
 
@@ -342,7 +342,7 @@
 			new dried(drop_location())
 			qdel(S)
 		return TRUE
-	for(var/obj/item/stack/sheet/wetleather/WL in src)
+	for(var/obj/item/stack/sheet/wethide/WL in src)
 		new /obj/item/stack/sheet/leather(drop_location(), WL.amount)
 		qdel(WL)
 		return TRUE
@@ -361,6 +361,7 @@
 /obj/machinery/smartfridge/drinks
 	name = "drink showcase"
 	desc = "A refrigerated storage unit for tasty tasty alcohol."
+	base_build_path = /obj/machinery/smartfridge/drinks
 
 /obj/machinery/smartfridge/drinks/accept_check(obj/item/O)
 	if(!istype(O, /obj/item/reagent_containers) || (O.item_flags & ABSTRACT) || !O.reagents || !O.reagents.reagent_list.len)
@@ -373,6 +374,7 @@
 // ----------------------------
 /obj/machinery/smartfridge/food
 	desc = "A refrigerated storage unit for food."
+	base_build_path = /obj/machinery/smartfridge/food
 
 /obj/machinery/smartfridge/food/accept_check(obj/item/O)
 	if(istype(O, /obj/item/reagent_containers/food/snacks/))
@@ -385,6 +387,7 @@
 /obj/machinery/smartfridge/extract
 	name = "smart slime extract storage"
 	desc = "A refrigerated storage unit for slime extracts."
+	base_build_path = /obj/machinery/smartfridge/extract
 
 /obj/machinery/smartfridge/extract/accept_check(obj/item/O)
 	if(istype(O, /obj/item/slime_extract))
@@ -403,6 +406,7 @@
 	name = "smart organ storage"
 	desc = "A refrigerated storage unit for organ storage."
 	max_n_of_items = 20	//vastly lower to prevent processing too long
+	base_build_path = /obj/machinery/smartfridge/organ
 	var/repair_rate = 0
 
 /obj/machinery/smartfridge/organ/accept_check(obj/item/O)
@@ -442,6 +446,7 @@
 /obj/machinery/smartfridge/chemistry
 	name = "smart chemical storage"
 	desc = "A refrigerated storage unit for medicine storage."
+	base_build_path = /obj/machinery/smartfridge/chemistry
 
 /obj/machinery/smartfridge/chemistry/accept_check(obj/item/O)
 	var/static/list/chemfridge_typecache = typecacheof(list(
@@ -484,6 +489,7 @@
 /obj/machinery/smartfridge/chemistry/virology
 	name = "smart virus storage"
 	desc = "A refrigerated storage unit for volatile sample storage."
+	base_build_path = /obj/machinery/smartfridge/chemistry/virology
 
 /obj/machinery/smartfridge/chemistry/virology/preloaded
 	initial_contents = list(
@@ -505,6 +511,7 @@
 	icon_state = "disktoaster"
 	pass_flags = PASSTABLE
 	visible_contents = FALSE
+	base_build_path = /obj/machinery/smartfridge/disks
 
 /obj/machinery/smartfridge/disks/accept_check(obj/item/O)
 	if(istype(O, /obj/item/disk/))

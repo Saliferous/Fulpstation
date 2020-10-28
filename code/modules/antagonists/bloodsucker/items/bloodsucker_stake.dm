@@ -27,7 +27,7 @@
 	desc = "A simple wooden stake carved to a sharp point."
 	icon = 'icons/Fulpicons/fulpitems.dmi'
 	icon_state = "wood" // Inventory Icon
-	item_state = "wood" // In-hand Icon
+	inhand_icon_state = "wood" // In-hand Icon
 	lefthand_file = 'icons/Fulpicons/fulpitems_hold_left.dmi' // File for in-hand icon
 	righthand_file = 'icons/Fulpicons/fulpitems_hold_right.dmi'
 	//origin_tech = "biotech=1;combat=1"
@@ -38,7 +38,7 @@
 	hitsound = 'sound/weapons/bladeslice.ogg'
 	force = 6
 	throwforce = 10
-	embedding = list("embed_chance" = 25, "embedded_fall_chance" = 0.5) // UPDATE 2/10/18 embedding_behavior.dm is how this is handled
+	embedding = list("embed_chance" = 25, "fall_chance" = 1) // UPDATE 2/28/20 check mutations/actions.dm for updates //  UPDATE 2/10/18 embedding_behavior.dm is how this is handled
 	//embed_chance = 25  // Look up "is_pointed" to see where we set stakes able to do this.
 	//embedded_fall_chance = 0.5 // Chance it will fall out.
 	obj_integrity = 30
@@ -111,7 +111,7 @@
 	B.embedded_objects |= src
 	add_mob_blood(target)//Place blood on the stake
 	loc = C // Put INSIDE the character
-	B.receive_damage(w_class * embedding.embedded_impact_pain_multiplier)
+	B.receive_damage(w_class * EMBEDDED_IMPACT_PAIN_MULTIPLIER) // embedding.embedded_impact_pain_multiplier)
 
 	if (C.mind)
 		var/datum/antagonist/bloodsucker/bloodsucker = C.mind.has_antag_datum(ANTAG_DATUM_BLOODSUCKER)
@@ -167,7 +167,7 @@
 	force = 8
 	throwforce = 12
 	armour_penetration = 10
-	embedding = list("embed_chance" = 50, "embedded_fall_chance" = 0) // UPDATE 2/10/18 embedding_behavior.dm is how this is handled
+	embedding = list("embed_chance" = 50, "fall_chance" = 0) //UPDATE 2/28/20 check mutations/actions.dm for updates //  UPDATE 2/10/18 embedding_behavior.dm is how this is handled
 	obj_integrity = 120
 	max_integrity = 120
 
@@ -177,7 +177,7 @@
 	name = "silver stake"
 	desc = "Polished and sharp at the end. For when some mofo is always trying to iceskate uphill."
 	icon_state = "silver" // Inventory Icon
-	item_state = "silver" // In-hand Icon
+	inhand_icon_state = "silver" // In-hand Icon
 	//origin_tech = "materials=1;combat=1;"
 	siemens_coefficient = 1 //flags = CONDUCT // var/siemens_coefficient = 1 // for electrical admittance/conductance (electrocution checks and shit)
 	force = 9

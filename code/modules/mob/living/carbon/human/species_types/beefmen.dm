@@ -27,7 +27,7 @@
 						   OFFSET_S_STORE = list(0,2), OFFSET_FACEMASK = list(0,3), OFFSET_HEAD = list(0,3), OFFSET_FACE = list(0,3), OFFSET_BELT = list(0,3), OFFSET_BACK = list(0,2), \
 						   OFFSET_SUIT = list(0,2), OFFSET_NECK = list(0,3))
 
-	skinned_type = /obj/item/reagent_containers/food/snacks/faggot // NO SKIN //  /obj/item/stack/sheet/animalhide/human
+	skinned_type = /obj/item/reagent_containers/food/snacks/meatball // NO SKIN //  /obj/item/stack/sheet/animalhide/human
 	meat = /obj/item/reagent_containers/food/snacks/meat/slab //What the species drops on gibbing
 	toxic_food = DAIRY | PINEAPPLE //NONE
 	disliked_food = VEGETABLES | FRUIT // | FRIED// GROSS | RAW
@@ -63,6 +63,17 @@
 	if (inFeatures["beefmouth"] == null || inFeatures["beefmouth"] == "")
 		inFeatures["beefmouth"] = pick(GLOB.mouths_beefman)
 
+/mob/living/carbon/human/proc/adjust_bl_all(var/type = "add", var/amount)
+	for(var/i in bodyparts)
+		var/obj/item/bodypart/BP = i
+		switch(type)
+			if ("+")
+				BP.generic_bleedstacks += amount
+			if ("=")
+				BP.generic_bleedstacks = amount
+			if ("-")
+				BP.generic_bleedstacks -= amount
+
 /datum/species/beefman/on_species_gain(mob/living/carbon/C, datum/species/old_species, pref_load)
 
 
@@ -91,10 +102,10 @@
 
 	// Be Spooked but Educated
 	//C.gain_trauma(pick(startTraumas))
-	if (SStraumas.phobia_words && SStraumas.phobia_words.len) // NOTE: ONLY if phobias have been defined! For some reason, sometimes this gets FUCKED??
-		C.gain_trauma(/datum/brain_trauma/mild/phobia/strangers)
-		C.gain_trauma(/datum/brain_trauma/mild/hallucinations)
-		C.gain_trauma(/datum/brain_trauma/special/bluespace_prophet/phobetor)
+	if (SStraumas.phobia_types && SStraumas.phobia_types.len) // NOTE: ONLY if phobias have been defined! For some reason, sometimes this gets FUCKED??
+		C.gain_trauma(/datum/brain_trauma/mild/phobia/strangers, TRAUMA_RESILIENCE_ABSOLUTE)
+		C.gain_trauma(/datum/brain_trauma/mild/hallucinations, TRAUMA_RESILIENCE_ABSOLUTE)
+		C.gain_trauma(/datum/brain_trauma/special/bluespace_prophet/phobetor, TRAUMA_RESILIENCE_ABSOLUTE)
 
 /datum/species/proc/set_beef_color(mob/living/carbon/human/H)
 	return // Do Nothing
@@ -103,27 +114,37 @@
 	fixed_mut_color = H.dna.features["beefcolor"]
 	default_color = fixed_mut_color
 
-
-
-/mob/living/carbon/proc/ReassignForeignBodyparts()
-	if (get_bodypart(BODY_ZONE_HEAD)?.type != part_default_head)  // <----- I think :? is used for procs instead of .? ...but apparently BYOND does that swap for you. //(!istype(get_bodypart(BODY_ZONE_HEAD), part_default_head))
-		qdel(get_bodypart(BODY_ZONE_HEAD))
-		new part_default_head().replace_limb(src,TRUE)
-	if (get_bodypart(BODY_ZONE_CHEST)?.type != part_default_chest)
-		qdel(get_bodypart(BODY_ZONE_CHEST))
-		new part_default_chest().replace_limb(src,TRUE)
-	if (get_bodypart(BODY_ZONE_L_ARM)?.type != part_default_l_arm)
-		qdel(get_bodypart(BODY_ZONE_L_ARM))
-		new part_default_l_arm().replace_limb(src,TRUE)
-	if (get_bodypart(BODY_ZONE_R_ARM)?.type != part_default_r_arm)
-		qdel(get_bodypart(BODY_ZONE_R_ARM))
-		new part_default_r_arm().replace_limb(src,TRUE)
-	if (get_bodypart(BODY_ZONE_L_LEG)?.type != part_default_l_leg)
-		qdel(get_bodypart(BODY_ZONE_L_LEG))
-		new part_default_l_leg().replace_limb(src,TRUE)
-	if (get_bodypart(BODY_ZONE_R_LEG)?.type != part_default_r_leg)
-		qdel(get_bodypart(BODY_ZONE_R_LEG))
-		new part_default_r_leg().replace_limb(src,TRUE)
+/mob/living/carbon/proc/ReassignForeignBodyparts() //This proc hurts me so much, it used to be worse, this really should be a list or something
+	var/obj/item/bodypart/head = get_bodypart(BODY_ZONE_HEAD)
+	if (head?.type != part_default_head)  // <----- I think :? is used for procs instead of .? ...but apparently BYOND does that swap for you. //(!istype(get_bodypart(BODY_ZONE_HEAD), part_default_head))
+		qdel(head)
+		var/obj/item/bodypart/limb = new part_default_head
+		limb.replace_limb(src,TRUE)
+	var/obj/item/bodypart/chest = get_bodypart(BODY_ZONE_CHEST)
+	if (chest?.type != part_default_chest)
+		qdel(chest)
+		var/obj/item/bodypart/limb = new part_default_chest
+		limb.replace_limb(src,TRUE)
+	var/obj/item/bodypart/l_arm = get_bodypart(BODY_ZONE_L_ARM)
+	if (l_arm?.type != part_default_l_arm)
+		qdel(l_arm)
+		var/obj/item/bodypart/limb = new part_default_l_arm
+		limb.replace_limb(src,TRUE)
+	var/obj/item/bodypart/r_arm = get_bodypart(BODY_ZONE_R_ARM)
+	if (r_arm?.type != part_default_r_arm)
+		qdel(r_arm)
+		var/obj/item/bodypart/limb = new part_default_r_arm
+		limb.replace_limb(src,TRUE)
+	var/obj/item/bodypart/l_leg = get_bodypart(BODY_ZONE_L_LEG)
+	if (l_leg?.type != part_default_l_leg)
+		qdel(l_leg)
+		var/obj/item/bodypart/limb = new part_default_l_leg
+		limb.replace_limb(src,TRUE)
+	var/obj/item/bodypart/r_leg = get_bodypart(BODY_ZONE_R_LEG)
+	if (r_leg?.type != part_default_r_leg)
+		qdel(r_leg)
+		var/obj/item/bodypart/limb = new part_default_r_leg
+		limb.replace_limb(src,TRUE)
 
 /datum/species/beefman/on_species_loss(mob/living/carbon/human/C, datum/species/new_species, pref_load)
 	..()
@@ -138,9 +159,9 @@
 	C.ReassignForeignBodyparts()
 
 	// Resolve Trauma
-	C.cure_trauma_type(/datum/brain_trauma/special/bluespace_prophet/phobetor)
-	C.cure_trauma_type(/datum/brain_trauma/mild/phobia/strangers)
-	C.cure_trauma_type(/datum/brain_trauma/mild/hallucinations)
+	C.cure_trauma_type(/datum/brain_trauma/special/bluespace_prophet/phobetor, TRAUMA_RESILIENCE_ABSOLUTE)
+	C.cure_trauma_type(/datum/brain_trauma/mild/phobia/strangers, TRAUMA_RESILIENCE_ABSOLUTE)
+	C.cure_trauma_type(/datum/brain_trauma/mild/hallucinations, TRAUMA_RESILIENCE_ABSOLUTE)
 
 
 
@@ -157,21 +178,20 @@
 	// Step 1) Being burned keeps the juices in.
 	var/searJuices = H.getFireLoss_nonProsthetic() / 10
 
-	// Step 2) Bleed out those juices by warmth, minus burn damage.
-	H.bleed_rate = CLAMP((H.bodytemperature - 285) / 20 - searJuices, 0, 5) // Every 20 points above 285 increases bleed rate. Don't worry, you're cold blooded.
-
-	// Step 3) If we're salted, we'll bleed more (it gets reset next tick)
+	// Step 2) Bleed out those juices by warmth, minus burn damage. If we are salted - bleed more
 	if (dehydrate > 0)
-		H.bleed_rate += 2
+		H.adjust_bl_all("=", clamp((H.bodytemperature - 293) / 20 - searJuices, 2, 10))
 		dehydrate -= 0.5
+	else
+		H.adjust_bl_all("=", clamp((H.bodytemperature - 293) / 20 - searJuices, 0, 5))
 
 	// Replenish Blood Faster! (But only if you actually make blood)
-	if (dehydrate <= 0 && H.bleed_rate <= 0 && H.blood_volume < BLOOD_VOLUME_NORMAL && !HAS_TRAIT(H, TRAIT_NOMARROW))
-		H.blood_volume += 2
-
-// TO-DO // Drop lots of meat on gib?
-/datum/species/beefman/spec_death(gibbed, mob/living/carbon/human/H)
-	return ..()
+	var/bleed_rate = 0
+	for(var/i in H.bodyparts)
+		var/obj/item/bodypart/BP = i
+		bleed_rate += BP.generic_bleedstacks
+	if (dehydrate <= 0 && bleed_rate <= 0 && H.blood_volume < BLOOD_VOLUME_NORMAL && !HAS_TRAIT(H, TRAIT_NOMARROW))
+		H.blood_volume += 4
 
 /datum/species/beefman/before_equip_job(datum/job/J, mob/living/carbon/human/H)
 
@@ -186,7 +206,7 @@
 		if("Security Officer", "Warden", "Detective", "Head of Security", "Deputy")
 			newSash = new /obj/item/clothing/under/bodysash/security()
 		// Medical
-		if("Medical Doctor", "Chemist", "Geneticist", "Virologist", "Chief Medical Officer")
+		if("Medical Doctor", "Chemist", "Geneticist", "Virologist", "Chief Medical Officer", "Paramedic")
 			newSash = new /obj/item/clothing/under/bodysash/medical()
 		// Science
 		if("Scientist", "Roboticist", "Research Director")
@@ -209,9 +229,11 @@
 		// Civilian
 		else
 			newSash = new /obj/item/clothing/under/bodysash/civilian()
-
-	H.equip_to_slot_or_del(newSash, ITEM_SLOT_OCLOTHING) // equip_to_slot_or_del
-
+	// Destroy Original Uniform (there probably isn't one though)
+	if (H.w_uniform)
+		qdel(H.w_uniform)
+	// Equip New
+	H.equip_to_slot_or_del(newSash, ITEM_SLOT_ICLOTHING, TRUE) // TRUE is whether or not this is "INITIAL", as in startup
 	return ..()
 
 /datum/species/beefman/after_equip_job(datum/job/J, mob/living/carbon/human/H)
@@ -226,7 +248,6 @@
 		qdel(H.wear_suit)
 
 
-
 /datum/species/beefman/handle_chemicals(datum/reagent/chem, mob/living/carbon/human/H)
 	. = ..() // Let species run its thing by default, TRUST ME
 	// Salt HURTS
@@ -238,9 +259,9 @@
 		dehydrate ++
 		return TRUE
 	// Regain BLOOD
-	else if(istype(chem, /datum/reagent/consumable/nutriment) || istype(chem, /datum/reagent/iron))
+	if(istype(chem, /datum/reagent/consumable/nutriment) || istype(chem, /datum/reagent/iron))
 		if (H.blood_volume < BLOOD_VOLUME_NORMAL)
-			H.blood_volume += 2
+			H.blood_volume += 5
 			H.reagents.remove_reagent(chem.type, REAGENTS_METABOLISM)
 			return TRUE
 
@@ -269,13 +290,13 @@
 
 /datum/species/beefman/help(mob/living/carbon/human/user, mob/living/carbon/human/target, datum/martial_art/attacker_style)
 	// Bleed On
-	if (user != target && user.bleed_rate)
+	if (user != target && user.is_bleeding())
 		target.add_mob_blood(user)
 	return ..()
 
 /datum/species/beefman/grab(mob/living/carbon/human/user, mob/living/carbon/human/target, datum/martial_art/attacker_style)
 	// Bleed On
-	if (user != target && user.bleed_rate)
+	if (user != target && user.is_bleeding())
 		target.add_mob_blood(user) //  from atoms.dm, this is how you bloody something!
 	return ..()
 
@@ -316,8 +337,8 @@
 
 /datum/species/beefman/spec_unarmedattacked(mob/living/carbon/human/user, mob/living/carbon/human/target)
 	// Bleed On
-	if (user != target && user.bleed_rate)
-		target.add_mob_blood(user) //  from atoms.dm, this is how you bloody something!
+	if (user != target && user.is_bleeding())
+		target.add_mob_blood(user) //  from atoms.dm, this is how you bloody something!s
 	return ..()
 
 /datum/species/beefman/spec_attacked_by(obj/item/I, mob/living/user, obj/item/bodypart/affecting, intent, mob/living/carbon/human/H)
@@ -488,7 +509,7 @@
 
 	// Apply meat's Reagents to Me
 	if(inMeatObj.reagents && inMeatObj.reagents.total_volume)
-		inMeatObj.reagents.reaction(owner, INJECT, inMeatObj.reagents.total_volume) // Run Reaction: what happens when what they have mixes with what I have?
+		//inMeatObj.reagents.reaction(owner, INJECT, inMeatObj.reagents.total_volume) // Run Reaction: what happens when what they have mixes with what I have?	DEAD CODE MUST REWORK
 		inMeatObj.reagents.trans_to(owner, inMeatObj.reagents.total_volume)	// Run transfer of 1 unit of reagent from them to me.
 
 	qdel(inMeatObj)
@@ -520,7 +541,7 @@
 
 		// Apply my Reagents to Meat
 		if(inOwner.reagents && inOwner.reagents.total_volume)
-			inOwner.reagents.reaction(newMeat, INJECT, 20 / inOwner.reagents.total_volume) // Run Reaction: what happens when what they have mixes with what I have?
+			//inOwner.reagents.reaction(newMeat, INJECT, 20 / inOwner.reagents.total_volume) // Run Reaction: what happens when what they have mixes with what I have?	DEAD CODE MUST REWORK
 			inOwner.reagents.trans_to(newMeat, 20)	// Run transfer of 1 unit of reagent from them to me.
 
 		. = newMeat // Return MEAT
@@ -534,11 +555,6 @@
 	icon_greyscale_robotic = 'icons/Fulpicons/fulp_bodyparts_robotic.dmi'
 	heavy_brute_msg = "mincemeat"
 	heavy_burn_msg = "burned to a crisp"
-/obj/item/bodypart/head/beef/drop_limb(special) // from dismemberment.dm
-	amCondemned = TRUE
-	var/mob/owner_cache = owner
-	..() // Create Meat, Remove Limb
-	return drop_meat(owner_cache)
 
 /obj/item/bodypart/chest/beef
 	icon = 'icons/Fulpicons/fulp_bodyparts.dmi'
@@ -674,13 +690,13 @@
 	name = "body sash"
 	desc = "A simple body sash, slung from shoulder to hip."
 	icon = 'icons/Fulpicons/fulpclothing.dmi' // item icon
-	mob_overlay_icon =  'icons/Fulpicons/fulpclothing_worn.dmi' // mob worn icon
+	worn_icon =  'icons/Fulpicons/fulpclothing_worn.dmi' // mob worn icon
 	icon_state = "assistant" // Inventory Icon
 	//item_color = "assistant" // The worn item Icon
 	body_parts_covered = CHEST // |GROIN|ARMS
 	lefthand_file = 'icons/Fulpicons/fulpclothing_hold_left.dmi'
 	righthand_file = 'icons/Fulpicons/fulpclothing_hold_right.dmi'
-	item_state = "sash" // In-hand Icon
+	inhand_icon_state = "sash" // In-hand Icon
 
 /obj/item/clothing/under/bodysash/security
 	name = "security sash"
@@ -722,8 +738,6 @@
 	//item_color = "mime" // The worn item state
 
 
-
-
 ////////////	CUSTOM TRAUMAS
 
 
@@ -739,12 +753,15 @@
 
 /datum/brain_trauma/special/bluespace_prophet/phobetor/on_life()
 
+	var/turf/first_turf
+	var/turf/second_turf
+
 	// Make Next Portal
 	if(world.time > next_portal)
-		next_portal = world.time + 100
 
+/*
 		// Round One: Pick a Nearby Turf
-		var/list/turf/possible_turfs = return_valid_floor_in_range(owner, 6, 0, TRUE) // Source, Range, Has Floor
+		var/list/turf/possible_turfs = return_valid_floors_in_range(owner, 6, 0, TRUE) // Source, Range, Has Floor
 		if(!LAZYLEN(possible_turfs))
 			return
 		// First Pick:
@@ -753,7 +770,7 @@
 			return
 
 		// Round Two: Pick an even Further Turf
-		possible_turfs = return_valid_floor_in_range(first_turf, 20, 6, TRUE) // Source, Range, Has Floor
+		possible_turfs = return_valid_floors_in_range(first_turf, 20, 6, TRUE) // Source, Range, Has Floor
 		possible_turfs -= first_turf
 		if(!LAZYLEN(possible_turfs))
 			return
@@ -761,6 +778,22 @@
 		var/turf/second_turf = pick(possible_turfs)
 		if(!second_turf)
 			return
+*/
+
+		// Round One: Pick a Nearby Turf
+		first_turf = return_valid_floor_in_range(owner, 6, 0, TRUE)
+		if (!first_turf)
+			next_portal = world.time + 10
+			return
+
+		// Round Two: Pick an even Further Turf
+		second_turf = return_valid_floor_in_range(first_turf, 20, 6, TRUE)
+		if (!second_turf)
+			next_portal = world.time + 10
+			return
+
+		next_portal = world.time + 100
+
 
 		var/obj/effect/hallucination/simple/phobetor/first = new (first_turf, owner)
 		var/obj/effect/hallucination/simple/phobetor/second = new (second_turf, owner)
@@ -776,8 +809,9 @@
 		created_firsts += first
 
 	// Delete Next Portal if it's time (it will remove its partner)
-	if (created_firsts.len && world.time >= created_firsts[1].created_on + created_firsts[1].exist_length)
-		var/targetGate = created_firsts[1]
+	var/obj/effect/hallucination/simple/phobetor/first_on_the_stack = created_firsts[1]
+	if (created_firsts.len && world.time >= first_on_the_stack.created_on + first_on_the_stack.exist_length)
+		var/targetGate = first_on_the_stack
 		created_firsts -= targetGate
 		qdel(targetGate)
 

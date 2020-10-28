@@ -13,6 +13,8 @@
 	px_y = -8
 	stam_damage_coeff = 1
 	max_stamina_damage = 100
+	wound_resistance = 10
+	scars_covered_by_clothes = FALSE
 
 	var/mob/living/brain/brainmob = null //The current occupant.
 	var/obj/item/organ/brain/brain = null //The brain organ
@@ -91,7 +93,7 @@
 
 
 /obj/item/bodypart/head/can_dismember(obj/item/I)
-	if(!((owner.stat == DEAD) || owner.InFullCritical()))
+	if(owner && !((owner.stat == DEAD) || owner.InFullCritical()))
 		return FALSE
 	return ..()
 
@@ -147,6 +149,8 @@
 			if(S.hair_color)
 				if(S.hair_color == "mutcolor")
 					facial_hair_color = H.dna.features["mcolor"]
+				else if(hair_color == "fixedmutcolor")
+					facial_hair_color = "#[S.fixed_mut_color]"
 				else
 					facial_hair_color = S.hair_color
 			else
@@ -162,6 +166,8 @@
 			if(S.hair_color)
 				if(S.hair_color == "mutcolor")
 					hair_color = H.dna.features["mcolor"]
+				else if(hair_color == "fixedmutcolor")
+					hair_color = "#[S.fixed_mut_color]"
 				else
 					hair_color = S.hair_color
 			else

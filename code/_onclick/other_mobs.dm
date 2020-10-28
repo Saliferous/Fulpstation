@@ -5,8 +5,12 @@
 	Otherwise pretty standard.
 */
 /mob/living/carbon/human/UnarmedAttack(atom/A, proximity)
+	if(!has_active_hand()) //can't attack without a hand.
+		var/obj/item/bodypart/check_arm = get_active_hand()
+		if(check_arm && check_arm.is_disabled() == BODYPART_DISABLED_WOUND)
+			to_chat(src, "<span class='warning'>The damage in your [check_arm.name] is preventing you from using it! Get it fixed, or at least splinted!</span>")
+			return
 
-	if(!has_active_hand() && !A.use_without_hands) //can't attack without a hand.  // FULP: Unless this thing is MEANT to be used no matter what.
 		to_chat(src, "<span class='notice'>You look at your arm and sigh.</span>")
 		return
 
@@ -22,7 +26,7 @@
 	SEND_SIGNAL(src, COMSIG_HUMAN_MELEE_UNARMED_ATTACK, A, proximity)
 	A.attack_hand(src)
 
-//Return TRUE to cancel other attack hand effects that respect it.
+/// Return TRUE to cancel other attack hand effects that respect it.
 /atom/proc/attack_hand(mob/user)
 	. = FALSE
 	if(!(interaction_flags_atom & INTERACT_ATOM_NO_FINGERPRINT_ATTACK_HAND))
@@ -34,7 +38,7 @@
 
 //Return a non FALSE value to cancel whatever called this from propagating, if it respects it.
 /atom/proc/_try_interact(mob/user)
-	if(IsAdminGhost(user))		//admin abuse
+	if(isAdminGhostAI(user))		//admin abuse
 		return interact(user)
 	if(can_interact(user))
 		return interact(user)
@@ -176,9 +180,13 @@
 	Nothing happening here
 */
 /mob/living/simple_animal/slime/UnarmedAttack(atom/A)
+	if(isturf(A))
+		return ..()
 	A.attack_slime(src)
+
 /atom/proc/attack_slime(mob/user)
 	return
+
 /mob/living/simple_animal/slime/RestrainedClickOn(atom/A)
 	return
 

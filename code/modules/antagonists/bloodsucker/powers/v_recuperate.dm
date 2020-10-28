@@ -30,9 +30,9 @@
 	to_chat(owner, "<span class='notice'>Your muscles clench and your skin crawls as your master's immortal blood knits your wounds.</span>")
 
 	var/mob/living/carbon/C = owner
-	var/mob/living/carbon/human/H
-	if (ishuman(owner))
-		H = owner
+	//var/mob/living/carbon/human/H //See below
+//.	if (ishuman(owner))
+	//	H = owner
 
 	while (ContinueActive(owner))
 		var/bruteheal = min(C.getBruteLoss(), 1.5)
@@ -41,8 +41,8 @@
 		if (C.getStaminaLoss() < 60)
 			C.adjustStaminaLoss(25, forced = TRUE)
 		// Stop Bleeding
-		if (istype(H) && H.bleed_rate > 0 && rand(20) == 0)
-			H.bleed_rate --
+		//if (istype(H) && H.bleed_rate > 0 && rand(20) == 0)
+			//H.bleed_rate --DEAD CODE MUST REWORK TO FIT WOUNDS PR SOMEHOW
 
 		C.Jitter(5)
 
